@@ -1,29 +1,32 @@
-import { supabase } from '@/lib/supabase';
-import type { Tables, TableRow } from '@/lib/supabase';
+import { supabase } from "@/lib/supabase";
+import type { TableRow } from "@/lib/supabase";
 
 interface SubmissionResult {
   isCorrect: boolean;
-  submission: TableRow<'submissions'>;
+  submission: TableRow<"submissions">;
 }
 
-export async function submitChallenge(challengeId: string, flag: string): Promise<SubmissionResult> {
+export async function submitChallenge(
+  challengeId: string,
+  flag: string,
+): Promise<SubmissionResult> {
   try {
     const { data: challenge, error: challengeError } = await supabase
-      .from('challenges')
-      .select('flag, points')
-      .eq('id', challengeId)
+      .from("challenges")
+      .select("flag, points")
+      .eq("id", challengeId)
       .single();
 
     if (challengeError) throw challengeError;
-    if (!challenge) throw new Error('Challenge not found');
+    if (!challenge) throw new Error("Challenge not found");
 
     const isCorrect = challenge.flag === flag;
     const { data: user } = await supabase.auth.getUser();
 
-    if (!user.user) throw new Error('User not authenticated');
+    if (!user.user) throw new Error("User not authenticated");
 
     const { data: submission, error: submissionError } = await supabase
-      .from('submissions')
+      .from("submissions")
       .insert({
         challenge_id: challengeId,
         user_id: user.user.id,
@@ -34,11 +37,11 @@ export async function submitChallenge(challengeId: string, flag: string): Promis
       .single();
 
     if (submissionError) throw submissionError;
-    if (!submission) throw new Error('Failed to create submission');
+    if (!submission) throw new Error("Failed to create submission");
 
     if (isCorrect) {
       const { error: progressError } = await supabase
-        .from('user_progress')
+        .from("user_progress")
         .upsert({
           user_id: user.user.id,
           challenge_id: challengeId,
@@ -53,13 +56,13 @@ export async function submitChallenge(challengeId: string, flag: string): Promis
       submission,
     };
   } catch (error) {
-    throw error instanceof Error 
-      ? error 
-      : new Error('Failed to submit challenge');
+    throw error instanceof Error
+      ? error
+      : new Error("Failed to submit challenge");
   }
 }
 
-interface ChallengeProgress extends TableRow<'user_progress'> {
+interface ChallengeProgress extends TableRow<"user_progress"> {
   challenge: {
     id: string;
     title: string;
@@ -75,10 +78,13 @@ interface ChallengeProgress extends TableRow<'user_progress'> {
   };
 }
 
-export async function getChallengeProgress(userId: string): Promise<ChallengeProgress[]> {
+export async function getChallengeProgress(
+  userId: string,
+): Promise<ChallengeProgress[]> {
   const { data, error } = await supabase
-    .from('user_progress')
-    .select(`
+    .from("user_progress")
+    .select(
+      `
       *,
       challenge:challenges(
         id,
@@ -93,8 +99,9 @@ export async function getChallengeProgress(userId: string): Promise<ChallengePro
           )
         )
       )
-    `)
-    .eq('user_id', userId);
+    `,
+    )
+    .eq("user_id", userId);
 
   if (error) throw error;
   if (!data) return [];
@@ -112,9 +119,9 @@ interface LeaderboardEntry {
 
 export async function getLeaderboard(limit = 100): Promise<LeaderboardEntry[]> {
   const { data, error } = await supabase
-    .from('users_profiles')
-    .select('id, username, display_name, points, rank')
-    .order('points', { ascending: false })
+    .from("users_profiles")
+    .select("id, username, display_name, points, rank")
+    .order("points", { ascending: false })
     .limit(limit);
 
   if (error) throw error;
@@ -123,30 +130,33 @@ export async function getLeaderboard(limit = 100): Promise<LeaderboardEntry[]> {
   return data;
 }
 
-export async function getCompletedChallenges(userId: string): Promise<string[]> {
+export async function getCompletedChallenges(
+  userId: string,
+): Promise<string[]> {
   const { data, error } = await supabase
-    .from('user_progress')
-    .select('challenge_id')
-    .eq('user_id', userId);
+    .from("user_progress")
+    .select("challenge_id")
+    .eq("user_id", userId);
 
   if (error) throw error;
   if (!data) return [];
 
-  return data.map(progress => progress.challenge_id);
+  return data.map((progress) => progress.challenge_id);
 }
 
 export async function getChallengeStats(challengeId: string) {
   const { data, error } = await supabase
-    .from('submissions')
-    .select('is_correct')
-    .eq('challenge_id', challengeId);
+    .from("submissions")
+    .select("is_correct")
+    .eq("challenge_id", challengeId);
 
   if (error) throw error;
   if (!data) return { totalAttempts: 0, successRate: 0 };
 
   const totalAttempts = data.length;
-  const successfulAttempts = data.filter(s => s.is_correct).length;
-  const successRate = totalAttempts > 0 ? (successfulAttempts / totalAttempts) * 100 : 0;
+  const successfulAttempts = data.filter((s) => s.is_correct).length;
+  const successRate =
+    totalAttempts > 0 ? (successfulAttempts / totalAttempts) * 100 : 0;
 
   return {
     totalAttempts,

@@ -1,102 +1,101 @@
-"use client"
+"use client";
 
-import { useState, useEffect, useCallback } from "react"
-import { useParams, useRouter } from "next/navigation"
-import { Plus, Edit, Trash2, ArrowLeft, GripVertical } from "lucide-react"
-import { Button } from "@/components/ui/button"
+import { useState, useEffect, useCallback } from "react";
+import { useParams, useRouter } from "next/navigation";
+import { Plus, Edit, Trash2, ArrowLeft, GripVertical } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { ModuleDialog } from "@/components/admin/module-dialog"
-import { DeleteDialog } from "@/components/admin/delete-dialog"
-import { supabase } from "@/lib/supabase"
-import { useToast } from "@/hooks/use-toast"
-import type { Tables } from "@/lib/supabase"
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { ModuleDialog } from "@/components/admin/module-dialog";
+import { DeleteDialog } from "@/components/admin/delete-dialog";
+import { supabase } from "@/lib/supabase";
+import { useToast } from "@/hooks/use-toast";
+import type { Tables } from "@/lib/supabase";
 
 export default function CoursePage() {
-  const params = useParams<{ courseId: string }>()
-  const router = useRouter()
-  const { toast } = useToast()
-  const [course, setCourse] = useState<Tables["courses"]["Row"] | null>(null)
-  const [modules, setModules] = useState<Tables["modules"]["Row"][]>([])
-  const [isLoading, setIsLoading] = useState(true)
-  const [selectedModule, setSelectedModule] = useState<Tables["modules"]["Row"] | null>(null)
-  const [showModuleDialog, setShowModuleDialog] = useState(false)
-  const [showDeleteDialog, setShowDeleteDialog] = useState(false)
+  const params = useParams<{ courseId: string }>();
+  const router = useRouter();
+  const { toast } = useToast();
+  const [course, setCourse] = useState<Tables["courses"]["Row"] | null>(null);
+  const [modules, setModules] = useState<Tables["modules"]["Row"][]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [selectedModule, setSelectedModule] = useState<
+    Tables["modules"]["Row"] | null
+  >(null);
+  const [showModuleDialog, setShowModuleDialog] = useState(false);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
   const loadCourse = useCallback(async () => {
     try {
-      setIsLoading(true)
+      setIsLoading(true);
       const { data: courseData, error: courseError } = await supabase
         .from("courses")
         .select("*")
         .eq("id", params.courseId)
-        .single()
+        .single();
 
-      if (courseError) throw courseError
-      setCourse(courseData)
+      if (courseError) throw courseError;
+      setCourse(courseData);
 
       const { data: modulesData, error: modulesError } = await supabase
         .from("modules")
         .select("*")
         .eq("course_id", params.courseId)
-        .order("order_index")
+        .order("order_index");
 
-      if (modulesError) throw modulesError
-      setModules(modulesData)
+      if (modulesError) throw modulesError;
+      setModules(modulesData);
     } catch (error) {
       toast({
         title: "Error",
         description: "Failed to load course data",
         variant: "destructive",
-      })
+      });
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }, [params.courseId, toast])
+  }, [params.courseId, toast]);
 
   useEffect(() => {
     if (params.courseId) {
-      void loadCourse()
+      void loadCourse();
     }
-  }, [params.courseId, loadCourse])
+  }, [params.courseId, loadCourse]);
 
   const handleDelete = async (id: string) => {
     try {
-      const { error } = await supabase
-        .from("modules")
-        .delete()
-        .eq("id", id)
+      const { error } = await supabase.from("modules").delete().eq("id", id);
 
-      if (error) throw error
+      if (error) throw error;
 
       toast({
         title: "Success",
         description: "Module deleted successfully",
-      })
-      
-      void loadCourse()
+      });
+
+      void loadCourse();
     } catch (error) {
       toast({
         title: "Error",
         description: "Failed to delete module",
         variant: "destructive",
-      })
+      });
     }
-    setShowDeleteDialog(false)
-  }
+    setShowDeleteDialog(false);
+  };
 
   if (isLoading) {
-    return <div className="p-8">Loading...</div>
+    return <div className="p-8">Loading...</div>;
   }
 
   if (!course) {
-    return <div className="p-8">Course not found</div>
+    return <div className="p-8">Course not found</div>;
   }
 
   return (
@@ -119,21 +118,27 @@ export default function CoursePage() {
       <div className="flex justify-between items-center mb-8">
         <div className="space-x-2">
           <Badge>{course.category}</Badge>
-          <Badge variant={
-            course.difficulty === "Beginner" ? "default" :
-            course.difficulty === "Intermediate" ? "warning" :
-            "destructive"
-          }>
+          <Badge
+            variant={
+              course.difficulty === "Beginner"
+                ? "default"
+                : course.difficulty === "Intermediate"
+                  ? "secondary"
+                  : "destructive"
+            }
+          >
             {course.difficulty}
           </Badge>
-          <Badge variant={course.is_published ? "success" : "secondary"}>
+          <Badge variant={course.is_published ? "default" : "secondary"}>
             {course.is_published ? "Published" : "Draft"}
           </Badge>
         </div>
-        <Button onClick={() => {
-          setSelectedModule(null)
-          setShowModuleDialog(true)
-        }}>
+        <Button
+          onClick={() => {
+            setSelectedModule(null);
+            setShowModuleDialog(true);
+          }}
+        >
           <Plus className="h-4 w-4 mr-2" />
           Add Module
         </Button>
@@ -152,8 +157,8 @@ export default function CoursePage() {
                   variant="ghost"
                   size="icon"
                   onClick={() => {
-                    setSelectedModule(module)
-                    setShowModuleDialog(true)
+                    setSelectedModule(module);
+                    setShowModuleDialog(true);
                   }}
                 >
                   <Edit className="h-4 w-4" />
@@ -162,17 +167,13 @@ export default function CoursePage() {
                   variant="ghost"
                   size="icon"
                   onClick={() => {
-                    setSelectedModule(module)
-                    setShowDeleteDialog(true)
+                    setSelectedModule(module);
+                    setShowDeleteDialog(true);
                   }}
                 >
                   <Trash2 className="h-4 w-4" />
                 </Button>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="cursor-move"
-                >
+                <Button variant="ghost" size="icon" className="cursor-move">
                   <GripVertical className="h-4 w-4" />
                 </Button>
               </div>
@@ -204,5 +205,5 @@ export default function CoursePage() {
         description="Are you sure you want to delete this module? This action cannot be undone and will also delete all associated challenges."
       />
     </div>
-  )
+  );
 }

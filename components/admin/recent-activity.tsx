@@ -1,22 +1,22 @@
-"use client"
+"use client";
 
-import { useEffect, useState } from "react"
-import { Shield, AlertTriangle, Info } from "lucide-react"
-import { supabase } from "@/lib/supabase"
-import { formatDistanceToNow } from "date-fns"
+import { useEffect, useState } from "react";
+import { Shield, AlertTriangle, Info } from "lucide-react";
+import { supabase } from "@/lib/supabase";
+import { formatDistanceToNow } from "date-fns";
 
 interface Activity {
-  id: string
-  type: "submission" | "achievement" | "registration"
-  message: string
-  time: string
-  icon: typeof Shield
-  severity: "high" | "info" | "low"
+  id: string;
+  type: "submission" | "achievement" | "registration";
+  message: string;
+  time: string;
+  icon: typeof Shield;
+  severity: "high" | "info" | "low";
 }
 
 export function RecentActivity() {
-  const [activities, setActivities] = useState<Activity[]>([])
-  const [isLoading, setIsLoading] = useState(true)
+  const [activities, setActivities] = useState<Activity[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     async function loadActivities() {
@@ -24,92 +24,113 @@ export function RecentActivity() {
         const [
           { data: submissions },
           { data: achievements },
-          { data: registrations }
+          { data: registrations },
         ] = await Promise.all([
           supabase
-            .from('submissions')
-            .select('*, challenge:challenges(title), user:users_profiles(username)')
-            .order('created_at', { ascending: false })
+            .from("submissions")
+            .select(
+              "*, challenge:challenges(title), user:users_profiles(username)",
+            )
+            .order("created_at", { ascending: false })
             .limit(5),
           supabase
-            .from('user_achievements')
-            .select('*, achievement:achievements(title), user:users_profiles(username)')
-            .order('earned_at', { ascending: false })
+            .from("user_achievements")
+            .select(
+              "*, achievement:achievements(title), user:users_profiles(username)",
+            )
+            .order("earned_at", { ascending: false })
             .limit(5),
           supabase
-            .from('users_profiles')
-            .select('username, created_at')
-            .order('created_at', { ascending: false })
-            .limit(5)
-        ])
+            .from("users_profiles")
+            .select("username, created_at")
+            .order("created_at", { ascending: false })
+            .limit(5),
+        ]);
 
         const formattedActivities: Activity[] = [
-          ...(submissions?.map(s => ({
+          ...(submissions?.map((s) => ({
             id: s.id,
             type: "submission" as const,
-            message: `${s.user?.username} submitted ${s.is_correct ? 'correct' : 'incorrect'} solution for ${s.challenge?.title}`,
-            time: formatDistanceToNow(new Date(s.created_at), { addSuffix: true }),
+            message: `${s.user?.username} submitted ${s.is_correct ? "correct" : "incorrect"} solution for ${s.challenge?.title}`,
+            time: formatDistanceToNow(new Date(s.created_at), {
+              addSuffix: true,
+            }),
             icon: s.is_correct ? Shield : AlertTriangle,
-            severity: s.is_correct ? "info" : "high"
+            severity: s.is_correct ? ("info" as const) : ("high" as const),
           })) || []),
-          ...(achievements?.map(a => ({
+          ...(achievements?.map((a) => ({
             id: a.id,
             type: "achievement" as const,
             message: `${a.user?.username} earned achievement: ${a.achievement?.title}`,
-            time: formatDistanceToNow(new Date(a.earned_at), { addSuffix: true }),
+            time: formatDistanceToNow(new Date(a.earned_at), {
+              addSuffix: true,
+            }),
             icon: Shield,
-            severity: "info"
+            severity: "info" as const,
           })) || []),
-          ...(registrations?.map(r => ({
+          ...(registrations?.map((r) => ({
             id: r.username,
             type: "registration" as const,
             message: `New user registered: ${r.username}`,
-            time: formatDistanceToNow(new Date(r.created_at), { addSuffix: true }),
+            time: formatDistanceToNow(new Date(r.created_at), {
+              addSuffix: true,
+            }),
             icon: Info,
-            severity: "low"
-          })) || [])
-        ].sort((a, b) => new Date(b.time).getTime() - new Date(a.time).getTime())
-        .slice(0, 10)
+            severity: "low" as const,
+          })) || []),
+        ]
+          .sort(
+            (a, b) => new Date(b.time).getTime() - new Date(a.time).getTime(),
+          )
+          .slice(0, 10);
 
-        setActivities(formattedActivities)
+        setActivities(formattedActivities);
       } catch (error) {
-        console.error('Failed to load activities:', error)
+        console.error("Failed to load activities:", error);
       } finally {
-        setIsLoading(false)
+        setIsLoading(false);
       }
     }
 
-    void loadActivities()
+    void loadActivities();
 
     // Set up real-time subscriptions
     const submissionsSubscription = supabase
-      .channel('submissions')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'submissions' }, () => {
-        void loadActivities()
-      })
-      .subscribe()
+      .channel("submissions")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "submissions" },
+        () => {
+          void loadActivities();
+        },
+      )
+      .subscribe();
 
     const achievementsSubscription = supabase
-      .channel('achievements')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'user_achievements' }, () => {
-        void loadActivities()
-      })
-      .subscribe()
+      .channel("achievements")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "user_achievements" },
+        () => {
+          void loadActivities();
+        },
+      )
+      .subscribe();
 
     return () => {
-      void submissionsSubscription.unsubscribe()
-      void achievementsSubscription.unsubscribe()
-    }
-  }, [])
+      void submissionsSubscription.unsubscribe();
+      void achievementsSubscription.unsubscribe();
+    };
+  }, []);
 
   if (isLoading) {
-    return <div>Loading activities...</div>
+    return <div>Loading activities...</div>;
   }
 
   return (
     <div className="space-y-8">
       {activities.map((activity) => {
-        const Icon = activity.icon
+        const Icon = activity.icon;
         return (
           <div key={activity.id} className="flex items-start space-x-4">
             <div className={`p-2 rounded-full bg-primary/10`}>
@@ -120,8 +141,8 @@ export function RecentActivity() {
               <p className="text-xs text-muted-foreground">{activity.time}</p>
             </div>
           </div>
-        )
+        );
       })}
     </div>
-  )
+  );
 }

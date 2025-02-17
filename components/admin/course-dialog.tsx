@@ -1,18 +1,18 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { z } from "zod"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog"
+} from "@/components/ui/dialog";
 import {
   Form,
   FormControl,
@@ -20,17 +20,29 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form"
+} from "@/components/ui/form";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
-import { Switch } from "@/components/ui/switch"
-import { supabase } from "@/lib/supabase"
-import { useToast } from "@/hooks/use-toast"
+} from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
+import { supabase } from "@/lib/supabase";
+import { useToast } from "@/hooks/use-toast";
+
+export interface Course {
+  id: string;
+  title: string;
+  slug: string;
+  description: string;
+  category: string;
+  difficulty: string;
+  points: number;
+  image_url?: string;
+  is_published: boolean;
+}
 
 const formSchema = z.object({
   title: z.string().min(2, "Title must be at least 2 characters"),
@@ -41,13 +53,13 @@ const formSchema = z.object({
   points: z.number().min(0, "Points must be 0 or greater"),
   image_url: z.string().url("Must be a valid URL").optional(),
   is_published: z.boolean(),
-})
+});
 
 interface CourseDialogProps {
-  open: boolean
-  onOpenChange: (open: boolean) => void
-  course?: any
-  onSave: () => void
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  course?: Course;
+  onSave: () => void;
 }
 
 export function CourseDialog({
@@ -56,8 +68,8 @@ export function CourseDialog({
   course,
   onSave,
 }: CourseDialogProps) {
-  const [isLoading, setIsLoading] = useState(false)
-  const { toast } = useToast()
+  const [isLoading, setIsLoading] = useState(false);
+  const { toast } = useToast();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -71,37 +83,32 @@ export function CourseDialog({
       image_url: "",
       is_published: false,
     },
-  })
+  });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
-      setIsLoading(true)
+      setIsLoading(true);
       const { error } = course
-        ? await supabase
-            .from("courses")
-            .update(values)
-            .eq("id", course.id)
-        : await supabase
-            .from("courses")
-            .insert(values)
+        ? await supabase.from("courses").update(values).eq("id", course.id)
+        : await supabase.from("courses").insert(values);
 
-      if (error) throw error
+      if (error) throw error;
 
       toast({
         title: "Success",
         description: `Course ${course ? "updated" : "created"} successfully`,
-      })
-      
-      onSave()
-      onOpenChange(false)
+      });
+
+      onSave();
+      onOpenChange(false);
     } catch (error) {
       toast({
         title: "Error",
         description: `Failed to ${course ? "update" : "create"} course`,
         variant: "destructive",
-      })
+      });
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
   }
 
@@ -109,9 +116,7 @@ export function CourseDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[600px]">
         <DialogHeader>
-          <DialogTitle>
-            {course ? "Edit Course" : "Create Course"}
-          </DialogTitle>
+          <DialogTitle>{course ? "Edit Course" : "Create Course"}</DialogTitle>
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
@@ -175,10 +180,18 @@ export function CourseDialog({
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="Web Security">Web Security</SelectItem>
-                        <SelectItem value="Network Security">Network Security</SelectItem>
-                        <SelectItem value="Cryptography">Cryptography</SelectItem>
-                        <SelectItem value="Reverse Engineering">Reverse Engineering</SelectItem>
+                        <SelectItem value="Web Security">
+                          Web Security
+                        </SelectItem>
+                        <SelectItem value="Network Security">
+                          Network Security
+                        </SelectItem>
+                        <SelectItem value="Cryptography">
+                          Cryptography
+                        </SelectItem>
+                        <SelectItem value="Reverse Engineering">
+                          Reverse Engineering
+                        </SelectItem>
                         <SelectItem value="Forensics">Forensics</SelectItem>
                       </SelectContent>
                     </Select>
@@ -203,7 +216,9 @@ export function CourseDialog({
                       </FormControl>
                       <SelectContent>
                         <SelectItem value="Beginner">Beginner</SelectItem>
-                        <SelectItem value="Intermediate">Intermediate</SelectItem>
+                        <SelectItem value="Intermediate">
+                          Intermediate
+                        </SelectItem>
                         <SelectItem value="Advanced">Advanced</SelectItem>
                       </SelectContent>
                     </Select>
@@ -278,5 +293,5 @@ export function CourseDialog({
         </Form>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

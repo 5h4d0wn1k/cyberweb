@@ -1,18 +1,18 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { z } from "zod"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog"
+} from "@/components/ui/dialog";
 import {
   Form,
   FormControl,
@@ -20,39 +20,51 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form"
+} from "@/components/ui/form";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
-import { supabase } from "@/lib/supabase"
-import { useToast } from "@/hooks/use-toast"
-import type { Tables } from "@/lib/supabase"
+} from "@/components/ui/select";
+import { supabase } from "@/lib/supabase";
+import { useToast } from "@/hooks/use-toast";
+import type { Tables } from "@/lib/supabase";
 
 const formSchema = z.object({
-  title: z.string().min(2, "Title must be at least 2 characters").max(100, "Title must be less than 100 characters"),
-  description: z.string().min(10, "Description must be at least 10 characters").max(1000, "Description must be less than 1000 characters"),
+  title: z
+    .string()
+    .min(2, "Title must be at least 2 characters")
+    .max(100, "Title must be less than 100 characters"),
+  description: z
+    .string()
+    .min(10, "Description must be at least 10 characters")
+    .max(1000, "Description must be less than 1000 characters"),
   difficulty: z.enum(["Beginner", "Intermediate", "Advanced"], {
     required_error: "Difficulty is required",
   }),
-  points: z.number().min(0, "Points must be 0 or greater").max(1000, "Points must be less than 1000"),
-  flag: z.string().min(1, "Flag is required").max(200, "Flag must be less than 200 characters"),
+  points: z
+    .number()
+    .min(0, "Points must be 0 or greater")
+    .max(1000, "Points must be less than 1000"),
+  flag: z
+    .string()
+    .min(1, "Flag is required")
+    .max(200, "Flag must be less than 200 characters"),
   hints: z.array(z.string()).optional(),
   order_index: z.number().min(0, "Order must be 0 or greater"),
-})
+});
 
-type FormValues = z.infer<typeof formSchema>
+type FormValues = z.infer<typeof formSchema>;
 
 interface ChallengeDialogProps {
-  open: boolean
-  onOpenChange: (open: boolean) => void
-  moduleId: string
-  challenge?: Tables["challenges"]["Row"] | null
-  onSave: () => void
-  totalChallenges: number
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  moduleId: string;
+  challenge?: Tables["challenges"]["Row"] | null;
+  onSave: () => void;
+  totalChallenges: number;
 }
 
 export function ChallengeDialog({
@@ -63,58 +75,62 @@ export function ChallengeDialog({
   onSave,
   totalChallenges,
 }: ChallengeDialogProps) {
-  const [isLoading, setIsLoading] = useState(false)
-  const { toast } = useToast()
+  const [isLoading, setIsLoading] = useState(false);
+  const { toast } = useToast();
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
-    defaultValues: challenge ? {
-      ...challenge,
-      hints: challenge.hints ?? [],
-    } : {
-      title: "",
-      description: "",
-      difficulty: "Beginner",
-      points: 0,
-      flag: "",
-      hints: [],
-      order_index: totalChallenges,
-    },
-  })
+    defaultValues: challenge
+      ? {
+          ...challenge,
+          hints: challenge.hints ?? [],
+          difficulty: challenge.difficulty as
+            | "Beginner"
+            | "Intermediate"
+            | "Advanced",
+        }
+      : {
+          title: "",
+          description: "",
+          difficulty: "Beginner",
+          points: 0,
+          flag: "",
+          hints: [],
+          order_index: totalChallenges,
+        },
+  });
 
   async function onSubmit(values: FormValues) {
     try {
-      setIsLoading(true)
+      setIsLoading(true);
       const { error } = challenge
         ? await supabase
             .from("challenges")
             .update(values)
             .eq("id", challenge.id)
-        : await supabase
-            .from("challenges")
-            .insert({
-              ...values,
-              module_id: moduleId,
-            })
+        : await supabase.from("challenges").insert({
+            ...values,
+            module_id: moduleId,
+          });
 
-      if (error) throw error
+      if (error) throw error;
 
       toast({
         title: "Success",
         description: `Challenge ${challenge ? "updated" : "created"} successfully`,
-      })
-      
-      onSave()
-      onOpenChange(false)
+      });
+
+      onSave();
+      onOpenChange(false);
     } catch (error) {
-      console.error('Challenge save error:', error);
+      console.error("Challenge save error:", error);
       toast({
         title: "Error",
         description: `Failed to ${challenge ? "update" : "create"} challenge`,
         variant: "destructive",
-      })
+      });
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
   }
 
@@ -176,7 +192,9 @@ export function ChallengeDialog({
                       </FormControl>
                       <SelectContent>
                         <SelectItem value="Beginner">Beginner</SelectItem>
-                        <SelectItem value="Intermediate">Intermediate</SelectItem>
+                        <SelectItem value="Intermediate">
+                          Intermediate
+                        </SelectItem>
                         <SelectItem value="Advanced">Advanced</SelectItem>
                       </SelectContent>
                     </Select>
@@ -248,5 +266,5 @@ export function ChallengeDialog({
         </Form>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

@@ -1,33 +1,34 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { useRouter, useSearchParams } from "next/navigation"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Shield } from "lucide-react"
-import Link from "next/link"
-import { signIn } from "next-auth/react"
-import { useToast } from "@/hooks/use-toast"
+import { Suspense } from "react";
+import { useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Shield } from "lucide-react";
+import Link from "next/link";
+import { signIn } from "next-auth/react";
+import { useToast } from "@/hooks/use-toast";
 
-export default function LoginPage() {
-  const router = useRouter()
-  const searchParams = useSearchParams()
-  const { toast } = useToast()
-  const [error, setError] = useState("")
-  const [isLoading, setIsLoading] = useState(false)
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
+function LoginForm() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const { toast } = useToast();
+  const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    setError("")
-    setIsLoading(true)
+    e.preventDefault();
+    setError("");
+    setIsLoading(true);
 
     try {
-      const result = await signIn('credentials', {
+      const result = await signIn("credentials", {
         redirect: false,
         email,
-        password
+        password,
       });
 
       if (result && result.error) {
@@ -37,21 +38,21 @@ export default function LoginPage() {
       toast({
         title: "Login successful",
         description: "Welcome back!",
-      })
-      
-      const callbackUrl = searchParams?.get("callbackUrl") || "/education"
-      router.push(callbackUrl)
+      });
+
+      const callbackUrl = searchParams?.get("callbackUrl") || "/education";
+      router.push(callbackUrl);
     } catch (error) {
-      console.error('Login failed:', error)
+      console.error("Login failed:", error);
       if (error instanceof Error) {
-        setError(error.message || "Failed to login. Please try again.")
+        setError(error.message || "Failed to login. Please try again.");
       } else {
-        setError("Failed to login. Please try again.")
+        setError("Failed to login. Please try again.");
       }
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background">
@@ -59,7 +60,9 @@ export default function LoginPage() {
         <div className="text-center mb-8">
           <Shield className="h-12 w-12 text-primary mx-auto mb-4" />
           <h1 className="text-2xl font-bold">Sign In</h1>
-          <p className="text-muted-foreground">Welcome back to our security community</p>
+          <p className="text-muted-foreground">
+            Welcome back to our security community
+          </p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -96,12 +99,23 @@ export default function LoginPage() {
         <div className="mt-6 text-center text-sm">
           <p className="text-muted-foreground">
             Don't have an account?{" "}
-            <Link href="/auth/register" className="text-primary hover:underline">
+            <Link
+              href="/auth/register"
+              className="text-primary hover:underline"
+            >
               Create one
             </Link>
           </p>
         </div>
       </div>
     </div>
-  )
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <LoginForm />
+    </Suspense>
+  );
 }
