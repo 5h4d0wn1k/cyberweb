@@ -35,6 +35,18 @@ const solutions = [
     link: "/solutions/real-time-analytics",
   },
   {
+    title: "Advanced SIEM Platform",
+    description:
+      "Next-generation security information and event management powered by blockchain",
+    features: [
+      { name: "Event Correlation", icon: Activity },
+      { name: "Threat Intelligence", icon: Shield },
+      { name: "Blockchain Verification", icon: Blocks },
+      { name: "Automated Response", icon: Zap },
+    ],
+    link: "/solutions/siem",
+  },
+  {
     title: "Web3 Integration",
     description: "Blockchain-powered security features",
     features: [

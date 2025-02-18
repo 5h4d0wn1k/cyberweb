@@ -48,6 +48,36 @@ const solutionsData = {
       },
     ],
   },
+  siem: {
+    title: "Advanced SIEM Platform",
+    description:
+      "Next-generation security information and event management powered by blockchain technology",
+    features: [
+      {
+        title: "Event Correlation",
+        icon: Activity,
+        description:
+          "Advanced correlation engine to identify complex attack patterns and anomalies.",
+      },
+      {
+        title: "Threat Intelligence",
+        icon: Shield,
+        description:
+          "Integration with global threat feeds and real-time intelligence sharing.",
+      },
+      {
+        title: "Blockchain Verification",
+        icon: Blocks,
+        description:
+          "Immutable event logging and verification using blockchain technology.",
+      },
+      {
+        title: "Automated Response",
+        icon: Zap,
+        description: "Automated incident response and remediation workflows.",
+      },
+    ],
+  },
   "web3-security": {
     title: "Web3 Integration",
     description: "Blockchain-powered security features",
@@ -146,6 +176,11 @@ export default function SolutionPage({
       </div>
 
       <div className="mt-12 flex justify-center gap-4">
+        {params.solution === "siem" && (
+          <Button asChild size="lg" variant="default">
+            <Link href="/solutions/siem/download">Download SIEM</Link>
+          </Button>
+        )}
         <Button asChild size="lg">
           <Link href="/contact">Request Demo</Link>
         </Button>
