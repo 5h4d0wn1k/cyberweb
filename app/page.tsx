@@ -33,59 +33,52 @@ export default function Home() {
       <section className="relative pt-32 pb-24 px-4 hero-animate overflow-hidden">
         <div className="absolute inset-0 grid-pattern opacity-20"></div>
         <div className="container mx-auto text-center relative z-10">
-          <div className="inline-block mb-4 px-4 py-2 rounded-full bg-primary/10 border border-primary/20">
-            <span className="text-primary">
+          <div className="inline-block mb-6 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 animate-fade-in">
+            <span className="text-primary font-medium">
               Web3-Powered Security Solutions
             </span>
           </div>
-          <h1 className="text-4xl md:text-7xl font-bold mb-6 gradient-text leading-tight">
-            Next-Gen Security
-            <br />
-            Intelligence Platform
+          <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold mb-6 gradient-text leading-tight max-w-4xl mx-auto">
+            Next-Generation Security Intelligence Platform
           </h1>
-          <p className="text-xl md:text-2xl text-muted-foreground mb-8 max-w-3xl mx-auto">
+          <p className="text-xl md:text-2xl text-muted-foreground mb-12 max-w-3xl mx-auto leading-relaxed">
             Comprehensive cybersecurity solutions with advanced SIEM
-            capabilities, powered by Web3 technology
+            capabilities, powered by blockchain technology for unmatched
+            security and transparency
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16">
             <DemoDialog />
+            <Button asChild size="lg" className="text-lg">
+              <Link href="/products">View Products</Link>
+            </Button>
             <Button
-              size="lg"
-              variant="outline"
-              className="text-lg glass-effect"
               asChild
+              variant="outline"
+              size="lg"
+              className="text-lg glass-effect"
             >
-              <Link href="/about">Learn More</Link>
+              <Link href="/solutions">Explore Solutions</Link>
             </Button>
           </div>
 
           {/* Stats */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mt-16 max-w-4xl mx-auto">
-            <div className="glass-effect rounded-lg p-6">
-              <div className="text-3xl font-bold gradient-text">1M+</div>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 lg:gap-8 mt-8 max-w-4xl mx-auto">
+            <div className="glass-effect rounded-lg p-6 transform hover:scale-105 transition-transform duration-200">
+              <div className="text-3xl font-bold gradient-text mb-2">1M+</div>
               <div className="text-muted-foreground">Events Monitored</div>
             </div>
-            <div className="glass-effect rounded-lg p-6">
-              <div className="text-3xl font-bold gradient-text">99.9%</div>
+            <div className="glass-effect rounded-lg p-6 transform hover:scale-105 transition-transform duration-200">
+              <div className="text-3xl font-bold gradient-text mb-2">99.9%</div>
               <div className="text-muted-foreground">Threat Detection</div>
             </div>
-            <div className="glass-effect rounded-lg p-6">
-              <div className="text-3xl font-bold gradient-text">500+</div>
+            <div className="glass-effect rounded-lg p-6 transform hover:scale-105 transition-transform duration-200">
+              <div className="text-3xl font-bold gradient-text mb-2">500+</div>
               <div className="text-muted-foreground">Enterprise Clients</div>
             </div>
-            <div className="glass-effect rounded-lg p-6">
-              <div className="text-3xl font-bold gradient-text">24/7</div>
+            <div className="glass-effect rounded-lg p-6 transform hover:scale-105 transition-transform duration-200">
+              <div className="text-3xl font-bold gradient-text mb-2">24/7</div>
               <div className="text-muted-foreground">Active Monitoring</div>
             </div>
-          </div>
-
-          <div className="flex justify-center gap-4">
-            <Button asChild size="lg">
-              <Link href="/products">View Products</Link>
-            </Button>
-            <Button asChild variant="outline" size="lg">
-              <Link href="/solutions">Explore Solutions</Link>
-            </Button>
           </div>
         </div>
       </section>
