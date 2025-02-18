@@ -1,16 +1,32 @@
 export interface Course {
   id: string;
   title: string;
-  description: string;
   slug: string;
-  category: "offensive" | "defensive" | "web3";
-  difficulty: "Beginner" | "Intermediate" | "Advanced";
-  published: boolean;
+  description: string;
+  difficulty: string;
+  category: string;
   points: number;
+  image_url: string | null;
+  is_published: boolean;
   created_at: string;
   updated_at: string;
-  modules: Module[];
-  progress?: CourseProgress;
+  modules: Array<{
+    id: string;
+    title: string;
+    description: string;
+    order_index: number;
+    points: number;
+    challenges: Array<{
+      id: string;
+      title: string;
+      difficulty: string;
+      points: number;
+    }>;
+    userProgress?: {
+      completed: boolean;
+      attempts: number;
+    };
+  }>;
 }
 
 export interface Module {

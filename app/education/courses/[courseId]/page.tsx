@@ -7,18 +7,36 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
 import { Lock, CheckCircle } from "lucide-react";
-import type { Tables } from "@/lib/supabase";
 
-type CourseWithProgress = Tables["courses"]["Row"] & {
-  modules: Array<
-    Tables["modules"]["Row"] & {
-      challenges: Tables["challenges"]["Row"][];
-      userProgress?: {
-        completed: boolean;
-        attempts: number;
-      };
-    }
-  >;
+type CourseWithProgress = {
+  id: string;
+  title: string;
+  slug: string;
+  description: string;
+  difficulty: string;
+  category: string;
+  points: number;
+  image_url: string | null;
+  is_published: boolean;
+  created_at: string;
+  updated_at: string;
+  modules: Array<{
+    id: string;
+    title: string;
+    description: string;
+    order_index: number;
+    points: number;
+    challenges: Array<{
+      id: string;
+      title: string;
+      difficulty: string;
+      points: number;
+    }>;
+    userProgress?: {
+      completed: boolean;
+      attempts: number;
+    };
+  }>;
 };
 
 export default function CoursePage() {
@@ -30,7 +48,9 @@ export default function CoursePage() {
   useEffect(() => {
     const fetchCourse = async () => {
       try {
-        const courseData = await api.courses.get(params.courseId as string);
+        const courseData = await api.education.courses.get(
+          params.courseId as string,
+        );
         setCourse(courseData);
       } catch (err) {
         setError(err instanceof Error ? err.message : "Failed to load course");

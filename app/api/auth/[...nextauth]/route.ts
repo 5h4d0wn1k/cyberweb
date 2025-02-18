@@ -3,8 +3,8 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import { createClient } from "@supabase/supabase-js";
 import { z } from "zod";
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL as string;
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY as string;
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
 if (!supabaseUrl || !supabaseAnonKey) {
   throw new Error("Missing Supabase environment variables");
@@ -49,22 +49,41 @@ const handler = NextAuth({
             .from("users_profiles")
             .select("*")
             .eq("id", authData.user.id)
-            .single();
+            .maybeSingle();
 
           if (profileError) throw profileError;
-          if (!profile) throw new Error("No profile found");
+          if (!profile) {
+            // Create profile if it doesn't exist
+            const { data: newProfile, error: createError } = await supabase
+              .from("users_profiles")
+              .insert({
+                id: authData.user.id,
+                email: authData.user.email,
+                username: authData.user.email?.split("@")[0],
+                role: "user",
+                points: 0,
+                rank: "Beginner",
+              })
+              .select()
+              .single();
 
-          // Update last login timestamp
-          await supabase
-            .from("users_profiles")
-            .update({ updated_at: new Date().toISOString() })
-            .eq("id", authData.user.id);
+            if (createError) throw createError;
+            if (!newProfile) throw new Error("Failed to create profile");
+
+            return {
+              id: authData.user.id,
+              email: authData.user.email,
+              name: newProfile.username,
+              role: newProfile.role,
+              profile: newProfile,
+            };
+          }
 
           return {
             id: authData.user.id,
             email: authData.user.email,
-            name: profile.display_name || profile.username,
-            role: profile.role || "user",
+            name: profile.username,
+            role: profile.role,
             profile,
           };
         } catch (error) {

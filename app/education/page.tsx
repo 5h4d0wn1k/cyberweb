@@ -51,10 +51,23 @@ export default function EducationPage() {
 
   const calculateOverallProgress = () => {
     if (!courses.length) return 0;
-    const totalProgress = courses.reduce(
-      (acc, course) => acc + (course.progress?.percentage || 0),
-      0,
-    );
+    const totalProgress = courses.reduce((acc, course) => {
+      const completedChallenges =
+        course.modules?.reduce(
+          (sum, module) =>
+            sum +
+            (module.userProgress?.completed ? module.challenges.length : 0),
+          0,
+        ) || 0;
+      const totalChallenges =
+        course.modules?.reduce(
+          (sum, module) => sum + module.challenges.length,
+          0,
+        ) || 0;
+      const percentage =
+        totalChallenges > 0 ? (completedChallenges / totalChallenges) * 100 : 0;
+      return acc + percentage;
+    }, 0);
     return Math.round(totalProgress / courses.length);
   };
 
@@ -123,11 +136,11 @@ export default function EducationPage() {
                           {course.title}
                         </CardTitle>
                         <Progress
-                          value={course.progress?.percentage || 0}
+                          value={calculateOverallProgress()}
                           className="h-2"
                         />
                         <CardDescription>
-                          {course.progress?.percentage || 0}% Complete
+                          {calculateOverallProgress()}% Complete
                         </CardDescription>
                       </CardHeader>
                       <CardContent>
@@ -136,7 +149,11 @@ export default function EducationPage() {
                         </p>
                         <Button variant="outline" className="w-full" asChild>
                           <Link href={`/education/courses/${course.id}`}>
-                            {course.progress ? "Continue" : "Start Path"}
+                            {course.modules?.some(
+                              (m) => m.userProgress?.completed,
+                            )
+                              ? "Continue"
+                              : "Start Path"}
                             <ArrowRight className="ml-2 h-4 w-4" />
                           </Link>
                         </Button>

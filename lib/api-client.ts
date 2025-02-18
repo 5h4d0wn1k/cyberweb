@@ -76,6 +76,25 @@ export const api = {
     },
   },
 
+  challenges: {
+    get: async (challengeId: string): Promise<Challenge> => {
+      return fetchAPI<Challenge>(`/api/challenges/${challengeId}`);
+    },
+
+    submit: async (
+      challengeId: string,
+      flag: string,
+    ): Promise<SubmissionResponse> => {
+      return fetchAPI<SubmissionResponse>(
+        `/api/challenges/${challengeId}/submit`,
+        {
+          method: "POST",
+          body: JSON.stringify({ flag }),
+        },
+      );
+    },
+  },
+
   user: {
     profile: async (): Promise<UserProfile> => {
       return fetchAPI("/api/user/profile");

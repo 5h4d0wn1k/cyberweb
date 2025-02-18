@@ -71,12 +71,12 @@ export default function ChallengePage() {
     setError(null);
 
     try {
-      const result = await api.challenges.submit(
+      const result = await api.education.challenges.submit(
         params.challengeId as string,
         flag,
       );
 
-      if (result.isCorrect) {
+      if (result.correct) {
         setSuccess(true);
         toast({
           title: "Congratulations!",
@@ -220,9 +220,9 @@ export default function ChallengePage() {
                     </dt>
                     <dd>
                       <ul className="list-disc pl-4 space-y-2">
-                        {challenge.hints.map((hint, index) => (
+                        {challenge.hints.map((hint) => (
                           <li
-                            key={`hint-${hint.id || index}`}
+                            key={`hint-${challenge.id}-${hint.substring(0, 32)}`}
                             className="text-sm"
                           >
                             {hint}

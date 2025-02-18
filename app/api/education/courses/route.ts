@@ -1,6 +1,13 @@
+export const dynamic = "force-dynamic";
+
 import { NextRequest, NextResponse } from "next/server";
 import { getToken } from "next-auth/jwt";
 import { getSupabaseServiceClient } from "@/lib/utils/supabase";
+
+interface Challenge {
+  id: string;
+  completed?: boolean;
+}
 
 export async function GET(req: NextRequest) {
   try {
@@ -46,11 +53,13 @@ export async function GET(req: NextRequest) {
     // Calculate progress for each course
     const coursesWithProgress = courses.map((course) => {
       const challenges = course.modules.flatMap(
-        (module: { challenges: { id: string }[] }) => module.challenges,
+        (module: { challenges: Challenge[] }) => module.challenges,
       );
       const totalChallenges = challenges.length;
       const completedChallenges = progress.filter((p) =>
-        challenges.some((c) => c.id === p.challenge_id && p.completed),
+        challenges.some(
+          (c: Challenge) => c.id === p.challenge_id && p.completed,
+        ),
       ).length;
 
       return {

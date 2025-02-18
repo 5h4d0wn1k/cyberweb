@@ -20,6 +20,21 @@ const registerSchema = z.object({
 
 export async function POST(req: NextRequest) {
   try {
+    // Verify environment variables are available
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+    if (!supabaseUrl || !supabaseServiceKey) {
+      console.error("Missing Supabase environment variables:", {
+        url: !!supabaseUrl,
+        serviceKey: !!supabaseServiceKey,
+      });
+      return NextResponse.json(
+        { error: "Server configuration error" },
+        { status: 500 },
+      );
+    }
+
     const body = await req.json();
     const { username, email, password } = registerSchema.parse(body);
 
@@ -31,6 +46,14 @@ export async function POST(req: NextRequest) {
       .select("username")
       .eq("username", username)
       .single();
+
+    if (checkError) {
+      console.error("Error checking existing user:", checkError);
+      return NextResponse.json(
+        { error: "Error checking username availability" },
+        { status: 500 },
+      );
+    }
 
     if (existingUser) {
       return NextResponse.json(
@@ -71,6 +94,8 @@ export async function POST(req: NextRequest) {
           email,
           role: "user",
           display_name: username,
+          points: 0,
+          rank: "Beginner",
         },
       ]);
 
