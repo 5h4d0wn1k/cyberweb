@@ -1,5 +1,5 @@
-import { ContactForm } from "@/components/contact-form"
-import { Shield, Mail, Phone, MapPin } from "lucide-react"
+import { ContactForm } from "@/components/contact-form";
+import { Shield, Mail, Phone, MapPin } from "lucide-react";
 
 export default function ContactPage() {
   return (
@@ -8,7 +8,8 @@ export default function ContactPage() {
         <div className="text-center mb-16">
           <h1 className="text-4xl font-bold mb-4 gradient-text">Contact Us</h1>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Get in touch with our team for any inquiries about our services or to discuss your security needs.
+            Get in touch with our team for any inquiries about our services or
+            to discuss your security needs.
           </p>
         </div>
 
@@ -19,15 +20,7 @@ export default function ContactPage() {
               <div className="space-y-4">
                 <div className="flex items-center space-x-3">
                   <Mail className="h-5 w-5 text-primary" />
-                  <span>contact@shadownik.com</span>
-                </div>
-                <div className="flex items-center space-x-3">
-                  <Phone className="h-5 w-5 text-primary" />
-                  <span>+1 (555) 123-4567</span>
-                </div>
-                <div className="flex items-center space-x-3">
-                  <MapPin className="h-5 w-5 text-primary" />
-                  <span>123 Security Street, Cyber City, CC 12345</span>
+                  <span>info@shadownik.online</span>
                 </div>
               </div>
             </div>
@@ -47,7 +40,8 @@ export default function ContactPage() {
                 <h3 className="text-lg font-semibold">Security First</h3>
               </div>
               <p className="text-muted-foreground">
-                Your security is our top priority. All communications are encrypted and handled with the utmost confidentiality.
+                Your security is our top priority. All communications are
+                encrypted and handled with the utmost confidentiality.
               </p>
             </div>
           </div>
@@ -59,5 +53,5 @@ export default function ContactPage() {
         </div>
       </div>
     </div>
-  )
+  );
 }

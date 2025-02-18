@@ -10,38 +10,79 @@ const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: {
-    default: "Shadownik - Advanced Cybersecurity Solutions",
-    template: "%s | Shadownik",
+    default: "Shadownik Cybersecurity - Advanced Training Platform",
+    template: "%s | Shadownik Cybersecurity",
   },
   description:
-    "Leading provider of cybersecurity solutions, services, and education. Protecting your digital assets with cutting-edge Web3 security.",
+    "Industry-leading cybersecurity training platform offering hands-on Web3, offensive, and defensive security courses. Join 10,000+ security professionals advancing their careers.",
   keywords: [
-    "cybersecurity",
+    "cybersecurity training",
     "web3 security",
-    "security training",
+    "offensive security",
+    "defensive security",
+    "CTF challenges",
     "blockchain security",
-    "SIEM",
+    "penetration testing",
+    "security certification",
+    "hands-on labs",
+    "cybersecurity courses",
   ],
-  authors: [{ name: "Shadownik" }],
+  authors: [
+    { name: "Shadownik", url: "https://cybersecurity.shadownik.online" },
+  ],
   creator: "Shadownik",
-  metadataBase: new URL(
-    process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000",
-  ),
+  publisher: "Shadownik Technologies",
+  formatDetection: {
+    email: true,
+    address: false,
+    telephone: false,
+  },
+  metadataBase: new URL("https://cybersecurity.shadownik.online"),
+  alternates: {
+    canonical: "https://cybersecurity.shadownik.online",
+    languages: {
+      "en-US": "https://cybersecurity.shadownik.online/en-us",
+    },
+  },
   openGraph: {
     type: "website",
     locale: "en_US",
-    url: "/",
-    title: "Shadownik - Advanced Cybersecurity Solutions",
+    url: "https://cybersecurity.shadownik.online",
+    title: "Shadownik Cybersecurity - Advanced Training Platform",
     description:
-      "Leading provider of cybersecurity solutions, services, and education.",
-    siteName: "Shadownik",
+      "Industry-leading cybersecurity training platform offering hands-on Web3, offensive, and defensive security courses.",
+    siteName: "Shadownik Cybersecurity",
+    images: [
+      {
+        url: "https://cybersecurity.shadownik.online/og-image.jpg",
+        width: 1200,
+        height: 630,
+        alt: "Shadownik Cybersecurity Training Platform",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Shadownik - Advanced Cybersecurity Solutions",
+    title: "Shadownik - Advanced Cybersecurity Training Platform",
     description:
-      "Leading provider of cybersecurity solutions, services, and education.",
+      "Industry-leading cybersecurity training platform offering hands-on Web3, offensive, and defensive security courses.",
     creator: "@shadownik",
+    images: ["/twitter-image.jpg"],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
+  verification: {
+    google: "google-site-verification-code",
+    yandex: "yandex-verification-code",
   },
 };
 
@@ -52,6 +93,8 @@ export const viewport: Viewport = {
   ],
   width: "device-width",
   initialScale: 1,
+  maximumScale: 5,
+  userScalable: true,
 };
 
 export default function RootLayout({
